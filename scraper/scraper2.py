@@ -13,7 +13,10 @@ from bs4 import BeautifulSoup
 
 # Constants
 DEFAULT_URL = "https://yle.fi/uutiset"
-RESPONSES_DIR = "responses"
+# Get the project root (parent of scraper directory)
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+RESPONSES_DIR = str(PROJECT_ROOT / "responses")
 DOWNLOADS_DIR = "downloads"
 ARTICLES_DIR = "articles"
 TIMEOUT_MAIN = 120000

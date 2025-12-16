@@ -10,8 +10,8 @@ translation:
 
 # LibreTranslate API settings
 libretranslate:
-  api_url: https://libretranslate.com/translate
-  api_key: null  # Optional - set if using API key
+  api_url: http://localhost:5000/translate
+  api_key: null  # Not needed for local instance
   timeout: 30
   max_retries: 3
   retry_delay: 2

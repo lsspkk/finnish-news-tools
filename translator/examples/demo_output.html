@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Yle Articles - Translated Demo
+  </title>
+  <style>
+   body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        article {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        article:last-child {
+            border-bottom: none;
+        }
+        header h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .hidden { display: none; }
+
+        .article-language-controls { 
+            margin: 20px 0; 
+        }
+
+        .article-language-controls button.lang-btn { 
+            padding: 8px 16px; 
+            margin-right: 8px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .article-language-controls button.lang-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .article-language-controls button.lang-btn.active {
+            background-color: #0366d6;
+            color: white;
+            border: 1px solid #0366d6;
+        }
+
+        .article-paragraph {
+            margin-bottom: 20px;
+        }
+
+        .article-paragraph .original-text {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .article-paragraph .translation {
+            margin-top: 8px;
+            padding-left: 20px;
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <article>
+    <header>
+     <h1>
+      Suomi voitti jääkiekon MM-kullan
+     </h1>
+    </header>
+    <div class="article-language-controls">
+     <button class="lang-btn" data-lang="en" onclick="toggleArticleLang(this, 'en')">
+      English
+     </button>
+     <button class="lang-btn" data-lang="sv" onclick="toggleArticleLang(this, 'sv')">
+      Svenska
+     </button>
+    </div>
+    <section>
+     <div class="article-paragraph">
+      <p class="original-text">
+       Suomen jääkiekkomaajoukkue voitti MM-kultaa dramaattisen finaalin jälkeen.
+      </p>
+      <p class="translation translation-en hidden" data-lang="en">
+       Finland's ice hockey team won the World Championship gold after a dramatic final.
+      </p>
+      <p class="translation translation-sv hidden" data-lang="sv">
+       Finlands ishockeylandslag vann VM-guld efter en dramatisk final.
+      </p>
+     </div>
+     <div class="article-paragraph">
+      <p class="original-text">
+       Ottelu päättyi jatkoajalla maaliin, joka ratkesi Suomen eduksi.
+      </p>
+      <p class="translation translation-en hidden" data-lang="en">
+       The match ended in overtime with a goal that was decided in Finland's favor.
+      </p>
+      <p class="translation translation-sv hidden" data-lang="sv">
+       Matchen slutade i övertid med ett mål som avgjordes till Finlands fördel.
+      </p>
+     </div>
+     <div class="article-paragraph">
+      <p class="original-text">
+       Joukkue juhli voittoa kannattajien kanssa kaupungin torilla.
+      </p>
+      <p class="translation translation-en hidden" data-lang="en">
+       The team celebrated the victory with fans in the city square.
+      </p>
+      <p class="translation translation-sv hidden" data-lang="sv">
+       Laget firade segern med fans på stadens torg.
+      </p>
+     </div>
+    </section>
+   </article>
+   
+   <article>
+    <header>
+     <h1>
+      Uusi tutkimus ilmastonmuutoksesta
+     </h1>
+    </header>
+    <div class="article-language-controls">
+     <button class="lang-btn" data-lang="en" onclick="toggleArticleLang(this, 'en')">
+      English
+     </button>
+     <button class="lang-btn" data-lang="sv" onclick="toggleArticleLang(this, 'sv')">
+      Svenska
+     </button>
+    </div>
+    <section>
+     <div class="article-paragraph">
+      <p class="original-text">
+       Tutkijat ovat löytäneet uusia todisteita ilmastonmuutoksen vaikutuksista Arktisella alueella.
+      </p>
+      <p class="translation translation-en hidden" data-lang="en">
+       Researchers have found new evidence of climate change impacts in the Arctic region.
+      </p>
+      <p class="translation translation-sv hidden" data-lang="sv">
+       Forskare har hittat nya bevis på klimatförändringarnas effekter i Arktis.
+      </p>
+     </div>
+     <div class="article-paragraph">
+      <p class="original-text">
+       Jäätiköt sulavat nopeammin kuin aiemmin arvioitiin.
+      </p>
+      <p class="translation translation-en hidden" data-lang="en">
+       Glaciers are melting faster than previously estimated.
+      </p>
+      <p class="translation translation-sv hidden" data-lang="sv">
+       Glaciärer smälter snabbare än tidigare uppskattat.
+      </p>
+     </div>
+    </section>
+   </article>
+  </div>
+  <script>
+   function toggleArticleLang(button, lang) {
+    // Find the article element
+    const article = button.closest('article');
+    
+    // Get all translation paragraphs in this article
+    const allTranslations = article.querySelectorAll('.translation');
+    
+    // Check if this language is currently active
+    const isActive = button.classList.contains('active');
+    
+    if (isActive) {
+        // Hide all translations of this language
+        allTranslations.forEach(el => {
+            if (el.getAttribute('data-lang') === lang) {
+                el.classList.add('hidden');
+            }
+        });
+        button.classList.remove('active');
+    } else {
+        // Show all translations of this language
+        allTranslations.forEach(el => {
+            if (el.getAttribute('data-lang') === lang) {
+                el.classList.remove('hidden');
+            }
+        });
+        button.classList.add('active');
+    }
+}
+  </script>
+ </body>
+</html>

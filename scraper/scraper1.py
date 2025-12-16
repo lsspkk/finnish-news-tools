@@ -1,11 +1,15 @@
 import sys
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 # Constants
 DEFAULT_URL = "https://yle.fi/uutiset"
-RESPONSES_DIR = "responses"
+# Get the project root (parent of scraper directory)
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+RESPONSES_DIR = str(PROJECT_ROOT / "responses")
 TIMEOUT = 120000
 DEFAULT_MIME = "application-octet-stream"
 API_VERSION_PATTERNS = ["/v1/", "/v2/", "/v3/", "/v4/"]

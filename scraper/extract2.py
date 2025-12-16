@@ -4,12 +4,16 @@ extract2.py - Extracts articles from scraped HTML into a cleaner, shorter format
 """
 import os
 import sys
+from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from jinja2 import Template
 
 # Constants
-DEFAULT_RESPONSES_DIR = "responses"
+# Get the project root (parent of scraper directory)
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+DEFAULT_RESPONSES_DIR = str(PROJECT_ROOT / "responses")
 BASE_URL = "https://yle.fi"
 
 def extract_full_article_from_file(article_file_path):
@@ -196,7 +200,7 @@ def main():
         responses_dir = input_path
         
         # If this is the base "responses" directory, find and use the most recent subfolder
-        if os.path.basename(responses_dir) == DEFAULT_RESPONSES_DIR and os.path.isdir(responses_dir):
+        if os.path.basename(responses_dir) == os.path.basename(DEFAULT_RESPONSES_DIR) and os.path.isdir(responses_dir):
             subdirs = [d for d in os.listdir(responses_dir) 
                        if os.path.isdir(os.path.join(responses_dir, d)) and not d.startswith('.')]
             if subdirs:

@@ -40,3 +40,7 @@ Thumbs.db
 
 # Project specific
 translator/examples/translated_articles.html
+translator/cache/
+translator/config.yaml
+translator/.env
+responses/

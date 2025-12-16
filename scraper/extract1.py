@@ -6,7 +6,10 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 # Constants
-DEFAULT_RESPONSES_DIR = "responses"
+# Get the project root (parent of scraper directory)
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+DEFAULT_RESPONSES_DIR = str(PROJECT_ROOT / "responses")
 SKIP_CONTENT_TYPES = ['javascript', 'application/javascript', 'image/', 'font/', 'video/', 'audio/', 'application/octet-stream', 'text/css']
 PRIORITY_SEARCH_TEXT = 10
 PRIORITY_API_JSON = 5

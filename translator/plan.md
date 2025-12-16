@@ -58,6 +58,22 @@ This document outlines the architecture and implementation plan for a translatio
   - Setup complexity
   - Slower than API-based solutions
 
+### Azure Translator
+
+- Pros:
+  - High quality neural machine translation
+  - Supports 100+ languages
+  - Free tier: 2 million characters per month
+  - Good documentation and SDK support
+  - Reliable and fast
+  - Enterprise-grade service
+- Cons:
+  - Requires Azure account and API key
+  - Cost per character after free tier
+  - Requires internet connection
+  - Data sent to Microsoft servers
+  - Some language codes differ from other providers (e.g., zh-Hans vs zh)
+
 ## Recommended Approach
 
 Start with LibreTranslate as the primary translation engine:
@@ -68,12 +84,21 @@ Start with LibreTranslate as the primary translation engine:
 - Good balance between quality and ease of use
 - Support architecture that allows switching to other providers later
 
+For higher quality translations and enterprise needs, consider Azure Translator:
+
+- Free tier provides 2 million characters per month
+- High quality neural machine translation
+- Good for production use when quality is important
+- Requires Azure account setup (see azure-translator-setup.md)
+- Monitor usage to stay within free tier limits
+
 Important considerations:
 
 - When using public API endpoints, translated content is sent to external services
 - For production use with sensitive content, consider self-hosting LibreTranslate
 - Evaluate data privacy requirements before choosing translation provider
 - Self-hosted solutions provide better control over data and privacy
+- Azure Translator offers enterprise-grade service with good free tier
 
 ## System Architecture
 
@@ -90,9 +115,27 @@ Important considerations:
 
 - Interface for translation providers
 - LibreTranslate implementation
+- Azure Translator implementation
 - Request batching and rate limiting
 - Error handling and retry logic
-- Caching mechanism to avoid redundant translations
+- File-based caching mechanism to avoid redundant translations
+
+#### Caching System
+
+- JSON-based cache storage organized by translation service and language pair
+- Cache structure: `translator/cache/{service_name}/translations_{source_lang}_{target_lang}.json`
+- Example: `cache/libretranslate/translations_fi_es.json` (Finnish to Spanish)
+- Each JSON file contains a dictionary mapping MD5 hash of source text to translated text
+- Benefits:
+  - Persistent storage across script runs
+  - Easy to inspect and debug cached translations (single JSON file per language pair)
+  - Service-specific organization prevents conflicts
+  - Efficient file management (one file per language pair instead of many individual files)
+  - Can manually edit or clear specific language pair caches
+- Cache lookup: Load JSON file for language pair, check if hash exists
+- Cache write: Update JSON file with new translations
+- Cache can be disabled via config option or command-line parameter
+- Default behavior: Use cache if cache files exist, otherwise disable
 
 #### HTML Generator
 
@@ -115,17 +158,27 @@ Important considerations:
       plan.md                    # This file
       config.yaml               # Configuration file
       translate.py              # Main translation script
-      translator/
-        __init__.py
-        parser.py               # HTML parsing logic
-        engine.py               # Translation engine interface
+      cache/                     # Translation cache directory
+        libretranslate/         # Service-specific cache folders
+          translations_fi_es.json  # Language pair cache files
+          translations_fi_sv.json
+          translations_fi_de.json
+        azure/                  # Azure Translator cache
+          translations_fi_en.json
+          translations_fi_sv.json
+      translators/
+        init.py
+        base.py                 # Base translator interface
         libretranslate.py       # LibreTranslate implementation
-        generator.py            # HTML generation
-        config.py               # Configuration handling
+        azure.py                # Azure Translator implementation
+      parser.py                 # HTML parsing logic
+      generator.py              # HTML generation
+      config.py                 # Configuration handling
       tests/
         test_parser.py
         test_engine.py
         test_generator.py
+        cache.test.py           # Cache functionality tests
       examples/
         sample_articles.html    # Sample input
         sample_output.html      # Sample output
@@ -148,16 +201,25 @@ Example config.yaml:
       # Note: Public instances send data to external servers
       # For sensitive content, use self-hosted instance
       
+    azure:
+      subscription_key: YOUR_API_KEY_HERE  # Azure Translator API key
+      endpoint: https://api.cognitive.microsofttranslator.com/
+      region: westeurope  # Your Azure resource region
+      timeout: 30
+      max_retries: 3
+      retry_delay: 2
+      
     input:
-      file: ../scraper/responses/latest/articles.html
+      file: ../responses/latest/articles.html
       
     output:
-      file: ../scraper/responses/latest/articles_multilingual.html
+      file: ../responses/latest/articles_multilingual.html
       template: template_multilingual.html
       
     options:
-      cache_translations: true
-      cache_file: .translation_cache.json
+      cache:
+        enabled: true  # Enable/disable caching (default: true if cache files exist)
+        dir: cache     # Directory for cache files
       batch_size: 10
       preserve_html: true
 
@@ -335,6 +397,7 @@ CSS for language controls:
 - [ ] Implement translation engine
   - [ ] Create provider interface
   - [ ] Implement LibreTranslate client
+  - [ ] Implement Azure Translator client
   - [ ] Add caching mechanism
   - [ ] Implement retry logic
   
@@ -382,6 +445,8 @@ Specify input and output files:
 
 Use specific translation provider:
 
+    python translate.py --provider libretranslate
+    python translate.py --provider azure
     python translate.py --provider deepl --api-key YOUR_KEY
 
 Translate to specific languages only:
@@ -410,6 +475,7 @@ Verbose output:
 2. Create initial implementation
    - Start with simple parser
    - Implement basic LibreTranslate integration
+   - Implement Azure Translator integration
    - Create minimal HTML generator
 
 3. Test with sample data
@@ -422,6 +488,8 @@ Verbose output:
    - Implement caching
    - Optimize performance
    - Add support for additional providers
+   - Configure Azure Translator billing limits
+   - Monitor usage to stay within free tier
 
 5. Integration
    - Update scraper workflow to include translation

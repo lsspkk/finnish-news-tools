@@ -1,0 +1,39 @@
+# Translation configuration
+# Copy this file to config.yaml and customize for your setup
+
+# Translation settings
+translation:
+  provider: libretranslate  # or 'azure'
+  source_language: fi
+  target_languages:
+    - sv
+    - es
+    - de
+    - zh
+
+# LibreTranslate API settings
+libretranslate:
+  api_url: http://localhost:5000/translate  # or https://libretranslate.com/translate
+  api_key: null  # Optional - set if using API key
+  timeout: 30
+  max_retries: 3
+  retry_delay: 2
+
+# Azure Translator API settings
+azure:
+  subscription_key: YOUR_API_KEY_HERE  # Or set via .env: AZURE_TRANSLATOR_KEY1
+  endpoint: https://api.cognitive.microsofttranslator.com/
+  region: westeurope  # Or set via .env: AZURE_TRANSLATOR_REGION
+  timeout: 30
+  max_retries: 3
+  retry_delay: 2
+
+# Cache settings
+cache:
+  enabled: true  # Default: enabled if cache files exist
+  file: cache/translations.json  # Legacy option, not used
+
+# Output settings
+output:
+  add_language_controls: true
+  default_language: fi

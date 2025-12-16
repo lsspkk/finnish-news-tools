@@ -157,7 +157,9 @@
     const allLangs = container.querySelectorAll('[data-lang]');
     allLangs.forEach(el => el.classList.add('hidden'));
     const targetLang = container.querySelector('[data-lang="' + lang + '"]');
-    targetLang.classList.remove('hidden');
+    if (targetLang) {
+        targetLang.classList.remove('hidden');
+    }
     
     const buttons = container.querySelectorAll('button');
     buttons.forEach(btn => btn.classList.remove('active'));

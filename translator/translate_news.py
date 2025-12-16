@@ -42,7 +42,13 @@ def save_cache(cache_path: str, cache: dict):
 
 
 def get_text_hash(text: str) -> str:
-    """Generate hash for text to use as cache key."""
+    """
+    Generate hash for text to use as cache key.
+    
+    Note: MD5 is used here for cache key generation only (not cryptographic purposes).
+    While MD5 has known cryptographic weaknesses, it's sufficient for cache keys
+    where collision resistance is not a security concern.
+    """
     return hashlib.md5(text.encode('utf-8')).hexdigest()
 
 
@@ -221,7 +227,9 @@ function showLang(button, lang) {
     const allLangs = container.querySelectorAll('[data-lang]');
     allLangs.forEach(el => el.classList.add('hidden'));
     const targetLang = container.querySelector('[data-lang="' + lang + '"]');
-    targetLang.classList.remove('hidden');
+    if (targetLang) {
+        targetLang.classList.remove('hidden');
+    }
     
     const buttons = container.querySelectorAll('button');
     buttons.forEach(btn => btn.classList.remove('active'));

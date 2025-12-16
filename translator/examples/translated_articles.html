@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Yle Articles
+  </title>
+  <style>
+   body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        article {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        article:last-child {
+            border-bottom: none;
+        }
+        header h1 {
+            margin-top: 0;
+        }
+  </style>
+  <style>
+   .hidden { display: none; }
+.translation-controls { 
+    margin: 10px 0; 
+}
+.translation-controls button { 
+    padding: 5px 10px; 
+    margin-right: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+}
+.translation-controls button:hover {
+    background-color: #e0e0e0;
+}
+.translation-controls button.active {
+    background-color: #0366d6;
+    color: white;
+    border: 1px solid #0366d6;
+}
+.article-paragraph {
+    margin-bottom: 20px;
+}
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <article>
+    <header>
+     <h1>
+      Suomi voitti jääkiekon MM-kullan
+     </h1>
+    </header>
+    <section>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Suomen jääkiekkomaajoukkue voitti MM-kultaa dramaattisen finaalin jälkeen.
+      </p>
+      <p class="hidden" data-lang="en">
+       Suomen jääkiekkomaajoukkue voitti MM-kultaa dramaattisen finaalin jälkeen.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Suomen jääkiekkomaajoukkue voitti MM-kultaa dramaattisen finaalin jälkeen.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Ottelu päättyi jatkoajalla maaliin, joka ratkesi Suomen eduksi.
+      </p>
+      <p class="hidden" data-lang="en">
+       Ottelu päättyi jatkoajalla maaliin, joka ratkesi Suomen eduksi.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Ottelu päättyi jatkoajalla maaliin, joka ratkesi Suomen eduksi.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Joukkue juhli voittoa kannattajien kanssa kaupungin torilla.
+      </p>
+      <p class="hidden" data-lang="en">
+       Joukkue juhli voittoa kannattajien kanssa kaupungin torilla.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Joukkue juhli voittoa kannattajien kanssa kaupungin torilla.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+    </section>
+   </article>
+   <article>
+    <header>
+     <h1>
+      Uusi tutkimus ilmastonmuutoksesta
+     </h1>
+    </header>
+    <section>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Tutkijat ovat löytäneet uusia todisteita ilmastonmuutoksen vaikutuksista Arktisella alueella.
+      </p>
+      <p class="hidden" data-lang="en">
+       Tutkijat ovat löytäneet uusia todisteita ilmastonmuutoksen vaikutuksista Arktisella alueella.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Tutkijat ovat löytäneet uusia todisteita ilmastonmuutoksen vaikutuksista Arktisella alueella.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Jäätiköt sulavat nopeammin kuin aiemmin arvioitiin.
+      </p>
+      <p class="hidden" data-lang="en">
+       Jäätiköt sulavat nopeammin kuin aiemmin arvioitiin.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Jäätiköt sulavat nopeammin kuin aiemmin arvioitiin.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Tutkimus julkaistiin kansainvälisessä tiedelehdesssä.
+      </p>
+      <p class="hidden" data-lang="en">
+       Tutkimus julkaistiin kansainvälisessä tiedelehdesssä.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Tutkimus julkaistiin kansainvälisessä tiedelehdesssä.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+    </section>
+   </article>
+   <article>
+    <header>
+     <h1>
+      Teknologiayritys avaa uuden toimiston
+     </h1>
+    </header>
+    <section>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Suomalainen teknologiayritys laajentaa toimintaansa ja avaa uuden toimiston Helsinkiin.
+      </p>
+      <p class="hidden" data-lang="en">
+       Suomalainen teknologiayritys laajentaa toimintaansa ja avaa uuden toimiston Helsinkiin.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Suomalainen teknologiayritys laajentaa toimintaansa ja avaa uuden toimiston Helsinkiin.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Yritys aikoo palkata satoja uusia työntekijöitä ensi vuonna.
+      </p>
+      <p class="hidden" data-lang="en">
+       Yritys aikoo palkata satoja uusia työntekijöitä ensi vuonna.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Yritys aikoo palkata satoja uusia työntekijöitä ensi vuonna.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+    </section>
+   </article>
+  </div>
+  <script>
+   function showLang(button, lang) {
+    const container = button.closest('.article-paragraph');
+    const allLangs = container.querySelectorAll('[data-lang]');
+    allLangs.forEach(el => el.classList.add('hidden'));
+    const targetLang = container.querySelector('[data-lang="' + lang + '"]');
+    targetLang.classList.remove('hidden');
+    
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
+  </script>
+ </body>
+</html>

@@ -1,0 +1,27 @@
+# Translation configuration
+
+# Translation settings
+translation:
+  provider: libretranslate
+  source_language: fi
+  target_languages:
+    - en
+    - sv
+
+# LibreTranslate API settings
+libretranslate:
+  api_url: https://libretranslate.com/translate
+  api_key: null  # Optional - set if using API key
+  timeout: 30
+  max_retries: 3
+  retry_delay: 2
+
+# Cache settings
+cache:
+  enabled: true
+  file: cache/translations.json
+
+# Output settings
+output:
+  add_language_controls: true
+  default_language: fi

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Yle Articles</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        article {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        article:last-child {
+            border-bottom: none;
+        }
+        header h1 {
+            margin-top: 0;
+        }
+        figure {
+            margin: 20px 0;
+        }
+        .load-image-btn {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .load-image-btn:hover {
+            background-color: #0052a3;
+        }
+        .article-image {
+            width: 100%;
+            height: auto;
+            margin-top: 10px;
+            display: block;
+        }
+        figcaption {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .toggle-full-article-btn {
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .toggle-full-article-btn:hover {
+            background-color: #218838;
+        }
+        .full-article-content {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+        }
+        .full-article-content.show {
+            display: block;
+        }
+        .full-article-content h2 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .full-article-content p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% for article in articles %}
+        <article>
+            {% if article.title %}
+            <header><h1>{{ article.title }}</h1></header>
+            {% endif %}
+            
+            {% if article.image_url %}
+            <figure>
+                <button class="load-image-btn" onclick="loadImage('img-{{ loop.index0 }}', '{{ article.image_url|replace("'", "\\'")|replace('"', '\\"') }}')">Lataa kuva</button>
+                <img id="img-{{ loop.index0 }}" class="article-image" style="display:none;" alt="{{ article.image_description or '' }}">
+                {% if article.caption %}
+                <figcaption>{{ article.caption }}</figcaption>
+                {% endif %}
+            </figure>
+            {% endif %}
+            
+            {% if article.text %}
+            <section>
+                {% for para in article.paragraphs %}
+                    {% if para %}
+                    <p>{{ para }}</p>
+                    {% endif %}
+                {% endfor %}
+            </section>
+            {% endif %}
+            
+            {% if article.full_paragraphs %}
+            <p>
+                <button class="toggle-full-article-btn" onclick="toggleFullArticle('full-article-{{ loop.index0 }}', this)">
+                    Avaa koko juttu
+                </button>
+            </p>
+            <div id="full-article-{{ loop.index0 }}" class="full-article-content">
+                {% if article.full_title %}
+                <h2>{{ article.full_title }}</h2>
+                {% endif %}
+                {% for para in article.full_paragraphs %}
+                <p>{{ para }}</p>
+                {% endfor %}
+            </div>
+            {% elif article.full_article_url %}
+            <p><a href="{{ article.full_article_url }}">Avaa koko juttu</a></p>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    
+    <script>
+        function loadImage(imgId, imageUrl) {
+            const img = document.getElementById(imgId);
+            if (img.style.display === "none") {
+                img.src = imageUrl;
+                img.style.display = "block";
+                const btn = img.previousElementSibling;
+                if (btn && btn.classList.contains("load-image-btn")) {
+                    btn.textContent = "Piilota kuva";
+                }
+            } else {
+                img.style.display = "none";
+                const btn = img.previousElementSibling;
+                if (btn && btn.classList.contains("load-image-btn")) {
+                    btn.textContent = "Lataa kuva";
+                }
+            }
+        }
+        
+        function toggleFullArticle(contentId, button) {
+            const content = document.getElementById(contentId);
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Avaa koko juttu';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Piilota koko juttu';
+            }
+        }
+    </script>
+</body>
+</html>
+

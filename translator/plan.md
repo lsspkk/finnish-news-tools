@@ -68,6 +68,13 @@ Start with LibreTranslate as the primary translation engine:
 - Good balance between quality and ease of use
 - Support architecture that allows switching to other providers later
 
+Important considerations:
+
+- When using public API endpoints, translated content is sent to external services
+- For production use with sensitive content, consider self-hosting LibreTranslate
+- Evaluate data privacy requirements before choosing translation provider
+- Self-hosted solutions provide better control over data and privacy
+
 ## System Architecture
 
 ### Components
@@ -136,8 +143,10 @@ Example config.yaml:
       
     libretranslate:
       api_url: https://libretranslate.com/translate
-      api_key: null  # Optional for public instance
+      api_key: null  # Optional for public instance, but consider data privacy
       timeout: 30
+      # Note: Public instances send data to external servers
+      # For sensitive content, use self-hosted instance
       
     input:
       file: ../scraper/responses/latest/articles.html
@@ -267,7 +276,9 @@ Article structure with language controls:
     
     // Load saved preference
     const savedLang = localStorage.getItem('preferred-language');
-    if (savedLang && ['fi', 'en', 'sv'].includes(savedLang)) {
+    // Validate saved language to prevent potential issues
+    const validLanguages = ['fi', 'en', 'sv'];
+    if (savedLang && validLanguages.includes(savedLang)) {
       switchLanguage(savedLang);
     }
     </script>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Yle Articles - Translated Demo
+  </title>
+  <style>
+   body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        article {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        article:last-child {
+            border-bottom: none;
+        }
+        header h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .hidden { display: none; }
+        .translation-controls { 
+            margin: 10px 0; 
+        }
+        .translation-controls button { 
+            padding: 5px 10px; 
+            margin-right: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .translation-controls button:hover {
+            background-color: #e0e0e0;
+        }
+        .translation-controls button.active {
+            background-color: #0366d6;
+            color: white;
+            border: 1px solid #0366d6;
+        }
+        .article-paragraph {
+            margin-bottom: 20px;
+        }
+        .article-paragraph p {
+            line-height: 1.6;
+            color: #333;
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <article>
+    <header>
+     <h1>
+      Suomi voitti jääkiekon MM-kullan
+     </h1>
+    </header>
+    <section>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Suomen jääkiekkomaajoukkue voitti MM-kultaa dramaattisen finaalin jälkeen.
+      </p>
+      <p class="hidden" data-lang="en">
+       Finland's ice hockey team won the World Championship gold after a dramatic final.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Finlands ishockeylandslag vann VM-guld efter en dramatisk final.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Ottelu päättyi jatkoajalla maaliin, joka ratkesi Suomen eduksi.
+      </p>
+      <p class="hidden" data-lang="en">
+       The match ended in overtime with a goal that was decided in Finland's favor.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Matchen slutade i övertid med ett mål som avgjordes till Finlands fördel.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+    </section>
+   </article>
+   
+   <article>
+    <header>
+     <h1>
+      Uusi tutkimus ilmastonmuutoksesta
+     </h1>
+    </header>
+    <section>
+     <div class="article-paragraph">
+      <p data-lang="fi">
+       Tutkijat ovat löytäneet uusia todisteita ilmastonmuutoksen vaikutuksista Arktisella alueella.
+      </p>
+      <p class="hidden" data-lang="en">
+       Researchers have found new evidence of climate change impacts in the Arctic region.
+      </p>
+      <p class="hidden" data-lang="sv">
+       Forskare har hittat nya bevis på klimatförändringarnas effekter i Arktis.
+      </p>
+      <div class="translation-controls">
+       <button class="active" onclick="showLang(this, 'fi')">
+        Suomi
+       </button>
+       <button onclick="showLang(this, 'en')">
+        English
+       </button>
+       <button onclick="showLang(this, 'sv')">
+        Svenska
+       </button>
+      </div>
+     </div>
+    </section>
+   </article>
+  </div>
+  <script>
+   function showLang(button, lang) {
+    const container = button.closest('.article-paragraph');
+    const allLangs = container.querySelectorAll('[data-lang]');
+    allLangs.forEach(el => el.classList.add('hidden'));
+    const targetLang = container.querySelector('[data-lang="' + lang + '"]');
+    targetLang.classList.remove('hidden');
+    
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
+  </script>
+ </body>
+</html>

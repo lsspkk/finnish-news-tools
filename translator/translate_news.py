@@ -111,6 +111,26 @@ def translate_articles(soup: BeautifulSoup, translator, target_langs: List[str],
     for article_idx, article in enumerate(articles, 1):
         print(f"\nProcessing article {article_idx}/{len(articles)}")
         
+        # Add language toggle buttons at the top of the article (only for target languages)
+        controls = soup.new_tag('div', **{'class': 'article-language-controls'})
+        
+        # Buttons for target languages only (no Finnish button)
+        for lang in target_langs:
+            btn = soup.new_tag('button', **{
+                'class': 'lang-btn',
+                'data-lang': lang,
+                'onclick': f"toggleArticleLang(this, '{lang}')"
+            })
+            btn.string = get_language_name(lang)
+            controls.append(btn)
+        
+        # Insert controls at the beginning of the article (after header if it exists)
+        header = article.find('header')
+        if header:
+            header.insert_after(controls)
+        else:
+            article.insert(0, controls)
+        
         # Find all paragraphs in the article's section
         section = article.find('section')
         if not section:
@@ -128,8 +148,8 @@ def translate_articles(soup: BeautifulSoup, translator, target_langs: List[str],
             # Create container for this paragraph and its translations
             container = soup.new_tag('div', **{'class': 'article-paragraph'})
             
-            # Add original paragraph with data-lang attribute
-            original_p = soup.new_tag('p', **{'data-lang': source_lang})
+            # Add original paragraph (always visible, no data-lang or hidden class)
+            original_p = soup.new_tag('p', **{'class': 'original-text'})
             original_p.string = text
             container.append(original_p)
             
@@ -141,32 +161,11 @@ def translate_articles(soup: BeautifulSoup, translator, target_langs: List[str],
                 
                 # Add translated paragraph (hidden by default)
                 translated_p = soup.new_tag('p', **{
-                    'data-lang': lang,
-                    'class': 'hidden'
+                    'class': f'translation translation-{lang} hidden',
+                    'data-lang': lang
                 })
                 translated_p.string = translation
                 container.append(translated_p)
-            
-            # Add language toggle buttons
-            controls = soup.new_tag('div', **{'class': 'translation-controls'})
-            
-            # Button for source language (active by default)
-            btn_source = soup.new_tag('button', **{
-                'class': 'active',
-                'onclick': f"showLang(this, '{source_lang}')"
-            })
-            btn_source.string = get_language_name(source_lang)
-            controls.append(btn_source)
-            
-            # Buttons for target languages
-            for lang in target_langs:
-                btn = soup.new_tag('button', **{
-                    'onclick': f"showLang(this, '{lang}')"
-                })
-                btn.string = get_language_name(lang)
-                controls.append(btn)
-            
-            container.append(controls)
             
             # Replace original paragraph with container
             p.replace_with(container)
@@ -191,27 +190,44 @@ def add_styles_and_scripts(soup: BeautifulSoup) -> BeautifulSoup:
     style = soup.new_tag('style')
     style.string = """
 .hidden { display: none; }
-.translation-controls { 
-    margin: 10px 0; 
+
+.article-language-controls { 
+    margin: 20px 0; 
 }
-.translation-controls button { 
-    padding: 5px 10px; 
-    margin-right: 5px;
+
+.article-language-controls button.lang-btn { 
+    padding: 8px 16px; 
+    margin-right: 8px;
     cursor: pointer;
     border: 1px solid #ccc;
     background-color: #f0f0f0;
-    border-radius: 3px;
+    border-radius: 4px;
+    font-size: 14px;
 }
-.translation-controls button:hover {
+
+.article-language-controls button.lang-btn:hover {
     background-color: #e0e0e0;
 }
-.translation-controls button.active {
+
+.article-language-controls button.lang-btn.active {
     background-color: #0366d6;
     color: white;
     border: 1px solid #0366d6;
 }
+
 .article-paragraph {
     margin-bottom: 20px;
+}
+
+.article-paragraph .original-text {
+    margin-bottom: 8px;
+}
+
+.article-paragraph .translation {
+    margin-top: 8px;
+    padding-left: 20px;
+    font-style: italic;
+    color: #555;
 }
 """
     
@@ -222,18 +238,33 @@ def add_styles_and_scripts(soup: BeautifulSoup) -> BeautifulSoup:
     # Add JavaScript
     script = soup.new_tag('script')
     script.string = """
-function showLang(button, lang) {
-    const container = button.closest('.article-paragraph');
-    const allLangs = container.querySelectorAll('[data-lang]');
-    allLangs.forEach(el => el.classList.add('hidden'));
-    const targetLang = container.querySelector('[data-lang="' + lang + '"]');
-    if (targetLang) {
-        targetLang.classList.remove('hidden');
-    }
+function toggleArticleLang(button, lang) {
+    // Find the article element
+    const article = button.closest('article');
     
-    const buttons = container.querySelectorAll('button');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+    // Get all translation paragraphs in this article
+    const allTranslations = article.querySelectorAll('.translation');
+    
+    // Check if this language is currently active
+    const isActive = button.classList.contains('active');
+    
+    if (isActive) {
+        // Hide all translations of this language
+        allTranslations.forEach(el => {
+            if (el.getAttribute('data-lang') === lang) {
+                el.classList.add('hidden');
+            }
+        });
+        button.classList.remove('active');
+    } else {
+        // Show all translations of this language
+        allTranslations.forEach(el => {
+            if (el.getAttribute('data-lang') === lang) {
+                el.classList.remove('hidden');
+            }
+        });
+        button.classList.add('active');
+    }
 }
 """
     

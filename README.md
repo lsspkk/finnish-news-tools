@@ -11,12 +11,14 @@ See the same article in several languages to help language learning.
 ## Quick Start
 
 1. Setup virtual environment:
+
        python3 -m venv venv
        source venv/bin/activate  # Linux/Mac/WSL
        pip install -r requirements.txt
        playwright install chromium
 
 2. Run scripts:
+
        python scraper/scraper1.py [search_text]
        python translator/translate_news.py
 

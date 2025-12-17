@@ -3,6 +3,11 @@
 Tools for Web scraping and translation with multiple languages for Finnish news site YLE.
 Saved data has similar rights like it would be saved data from a web browser: personal use only.
 
+Translate news articles and switch between languages instantly in the browser. 
+See the same article in several languages to help language learning.
+
+![example](example.png)
+
 ## Quick Start
 
 1. Setup virtual environment:

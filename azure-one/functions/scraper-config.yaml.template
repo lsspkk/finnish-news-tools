@@ -1,0 +1,90 @@
+# Article Scraper Configuration Template
+# Copy this file to scraper-config.yaml.local for local development
+# Azure Functions use environment variables, but this template shows the structure
+
+scraping:
+  # Base URL patterns for articles
+  base_urls:
+    - "https://yle.fi/a/"
+  
+  # CSS selectors for extracting article content
+  selectors:
+    # Title selectors (tried in order, first match wins)
+    title:
+      - "h1.article-title"
+      - "h1.article__heading"
+      - "article h1"
+      - "h1"
+      - ".article-header h1"
+      - "title"
+    
+    # Paragraph selectors (tried in order, first successful selector wins)
+    paragraphs:
+      - "article .article-content p"
+      - "article .article-body p"
+      - "article .article__content p"
+      - "article p"
+      - ".article-content p"
+      - ".article-body p"
+      - "main article p"
+      - "main p"
+      - ".content p"
+    
+    # Elements to exclude from scraping (removed before parsing)
+    exclude:
+      - ".advertisement"
+      - ".ad"
+      - ".social-share"
+      - ".share-buttons"
+      - ".related-articles"
+      - ".related-content"
+      - ".article-footer"
+      - "footer"
+      - "nav"
+      - "header"
+      - "script"
+      - "style"
+      - ".comments"
+      - ".comment-section"
+      - ".newsletter"
+      - ".cookie-banner"
+  
+  # Text cleaning rules
+  cleaning:
+    remove_empty: true          # Remove empty paragraphs
+    min_length: 20             # Minimum paragraph length (characters)
+    strip_whitespace: true     # Strip leading/trailing whitespace
+    remove_newlines: false     # Keep newlines for readability
+    normalize_spaces: true     # Replace multiple spaces with single space
+  
+  # URL handling configuration
+  url:
+    add_origin_rss: true       # Add ?origin=rss suffix to URLs
+    remove_existing_params: false  # Keep existing query parameters
+  
+  # HTTP request settings
+  request:
+    timeout: 30                # Request timeout in seconds
+    max_retries: 3             # Maximum retry attempts
+    retry_delay: 2             # Delay between retries (seconds)
+    follow_redirects: true     # Follow HTTP redirects
+    max_redirects: 5           # Maximum redirects to follow
+    
+    # HTTP headers to mimic browser
+    headers:
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+      Accept-Language: "fi-FI,fi;q=0.9,en-US;q=0.8,en;q=0.7"
+      Accept-Encoding: "gzip, deflate, br"
+      Connection: "keep-alive"
+      Upgrade-Insecure-Requests: "1"
+
+# Storage configuration
+storage:
+  container: "scraped-content"
+  path_prefix: "articles"      # Path prefix for article storage
+
+# Logging configuration
+logging:
+  level: "INFO"                # DEBUG, INFO, WARNING, ERROR
+  log_failed_urls: true        # Log URLs that fail to scrape

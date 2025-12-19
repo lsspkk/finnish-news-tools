@@ -21,7 +21,7 @@ Edit `translator/config.yaml`:
 
     azure:
       subscription_key: YOUR_KEY  # Or use .env: AZURE_TRANSLATOR_KEY1
-      region: westeurope # Or use .env: AZURE_REGION
+      region: westeurope # Or use .env: AZURE_TRANSLATOR_REGION
 
 ## Usage
 

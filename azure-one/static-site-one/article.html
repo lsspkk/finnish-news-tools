@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article - Finnish News Reader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Finnish News Reader</h1>
+        <div>
+            <span class="username"></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="articleHeader"></div>
+        <div id="articleContent" class="article-content"></div>
+    </div>
+    
+    <script>
+        // Load config.js.local for local dev, config.js for Azure deployment
+        (function() {
+            const isLocalDev = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1' ||
+                               window.location.hostname === '';
+            const configFile = isLocalDev ? 'config.js.local' : 'config.js';
+            document.write('<script src="' + configFile + '"><\/script>');
+        })();
+    </script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script src="api.js"></script>
+    <script>
+        let articleData = null;
+        let loadedTranslations = {};
+        let articlePubDate = null;
+        
+        if (!isAuthenticated()) {
+            window.location.href = 'index.html';
+        }
+        
+        renderHeader();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const shortcode = urlParams.get('shortcode');
+        
+        if (!shortcode) {
+            document.getElementById('articleHeader').innerHTML = '<div class="no-data">No article specified</div>';
+        } else {
+            loadArticle();
+            loadQuota();
+        }
+        
+        async function loadQuota() {
+            try {
+                const quotaData = await fetchTranslatorQuota();
+                if (quotaData) {
+                    displayQuota(quotaData);
+                }
+            } catch (error) {
+                console.log('Could not load quota:', error);
+            }
+        }
+        
+        function displayQuota(quotaData) {
+            const quotaEl = document.getElementById('quotaDisplay');
+            if (!quotaEl) return;
+            
+            const remaining = quotaData.remaining_quota || 0;
+            const percentage = quotaData.percentage_used || 0;
+            const nextReset = quotaData.next_reset_date || '';
+            
+            let resetText = '';
+            if (nextReset) {
+                const resetDate = new Date(nextReset);
+                resetText = resetDate.toLocaleDateString('fi-FI', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric'
+                });
+            }
+            
+            const formattedRemaining = formatQuotaNumber(remaining);
+            quotaEl.textContent = `AzureTranslator quota: ${percentage.toFixed(1)}%, ${formattedRemaining} merkkiä käännettävissä${resetText ? ` ${resetText} asti` : ''}.`;
+        }
+        
+        function formatQuotaNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+        
+        async function loadArticle() {
+            const headerEl = document.getElementById('articleHeader');
+            const contentEl = document.getElementById('articleContent');
+            
+            try {
+                showLoading(headerEl);
+                
+                // Fetch RSS feed to get publication date
+                try {
+                    const feedData = await fetchRSSFeed();
+                    if (feedData && feedData.items) {
+                        const feedItem = feedData.items.find(item => item.shortcode === shortcode);
+                        if (feedItem && feedItem.pub_date) {
+                            articlePubDate = feedItem.pub_date;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Could not load RSS feed for date:', e);
+                }
+                
+                articleData = await fetchArticle(shortcode, CONFIG.sourceLanguage);
+                
+                if (!articleData) {
+                    hideLoading(headerEl);
+                    headerEl.innerHTML = '<div class="no-data">Article not found in cache</div>';
+                    return;
+                }
+                
+                hideLoading(headerEl);
+                
+                const yleUrl = `https://yle.fi/a/${shortcode}`;
+                headerEl.innerHTML = `
+                    <div class="article-header">
+                        <div class="article-header-top">
+                            <h1>${articleData.title}</h1>
+                            <button class="back-arrow-btn" onclick="goBack()" title="Takaisin">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="article-actions">
+                            <div class="article-actions-primary">
+                                <a href="${yleUrl}" target="_blank" class="btn btn-primary">Avaa uutinen YLE:n palvelussa</a>
+                            </div>
+                            <div class="article-actions-languages">
+                                ${CONFIG.languages.map(lang => `
+                                    <button class="btn btn-language" onclick="toggleTranslation('${lang.code}')" id="lang-${lang.code}">
+                                        ${lang.name}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if (articleData.paragraphs && articleData.paragraphs.length > 0) {
+                    renderArticleContent();
+                }
+                
+            } catch (error) {
+                hideLoading(headerEl);
+                headerEl.innerHTML = `<div class="no-data">Error loading article: ${error.message}</div>`;
+            }
+        }
+        
+        async function toggleTranslation(langCode) {
+            if (!articleData || !articleData.paragraphs) return;
+            
+            const btn = document.getElementById(`lang-${langCode}`);
+            const isActive = btn.classList.contains('active');
+            
+            if (isActive) {
+                btn.classList.remove('active');
+                delete loadedTranslations[langCode];
+                renderArticleContent();
+            } else {
+                btn.classList.add('active');
+                
+                if (!loadedTranslations[langCode]) {
+                    btn.disabled = true;
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Loading...';
+                    
+                    try {
+                        const articleId = articleData.article_id || shortcode;
+                        const translationResult = await translateArticle(
+                            articleId,
+                            CONFIG.sourceLanguage,
+                            langCode,
+                            articleData.paragraphs
+                        );
+                        
+                        if (translationResult && translationResult.translations) {
+                            loadedTranslations[langCode] = translationResult.translations;
+                        } else {
+                            throw new Error('Invalid translation response: missing translations field');
+                        }
+                    } catch (error) {
+                        alert(`Error loading translation: ${error.message}`);
+                        btn.classList.remove('active');
+                        return;
+                    } finally {
+                        btn.disabled = false;
+                        const langName = CONFIG.languages.find(l => l.code === langCode)?.name || langCode;
+                        btn.textContent = langName;
+                    }
+                }
+                
+                renderArticleContent();
+            }
+        }
+        
+        function renderArticleContent() {
+            const contentEl = document.getElementById('articleContent');
+            if (!articleData || !articleData.paragraphs) return;
+            
+            let dateHtml = '';
+            if (articlePubDate) {
+                dateHtml = `<div class="article-date">${formatDate(articlePubDate)}</div>`;
+            }
+            
+            const articleContent = articleData.paragraphs.map((para, index) => {
+                const translations = Object.keys(loadedTranslations)
+                    .filter(langCode => {
+                        const btn = document.getElementById(`lang-${langCode}`);
+                        return btn && btn.classList.contains('active');
+                    })
+                    .map(langCode => {
+                        if (loadedTranslations[langCode] && loadedTranslations[langCode][index]) {
+                            const langName = CONFIG.languages.find(l => l.code === langCode)?.name || langCode;
+                            return `
+                                <div class="translation">
+                                    <p>${loadedTranslations[langCode][index]}</p>
+                                </div>
+                            `;
+                        }
+                        return '';
+                    })
+                    .join('');
+                
+                return `
+                    <div class="article-paragraph">
+                        <p>${para}</p>
+                        ${translations}
+                    </div>
+                `;
+            }).join('');
+            
+            const backButtonHtml = `
+                <div class="article-footer">
+                    <button class="back-arrow-btn" onclick="goBack()" title="Takaisin">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            contentEl.innerHTML = dateHtml + articleContent + backButtonHtml;
+        }
+        
+        function goBack() {
+            const shortcode = new URLSearchParams(window.location.search).get('shortcode');
+            if (shortcode) {
+                window.location.href = `articles.html#article-${shortcode}`;
+            } else {
+                window.location.href = 'articles.html';
+            }
+        }
+    </script>
+</body>
+</html>

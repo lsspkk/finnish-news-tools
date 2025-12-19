@@ -1,0 +1,35 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "USE_LOCAL_STORAGE": "true",
+    "LOCAL_STORAGE_PATH": "./local-dev/storage",
+    "LOCAL_TABLES_PATH": "./local-dev/tables",
+    "RSS_FEED_URL": "https://yle.fi/rss/uutiset/paauutiset",
+    "STORAGE_CONTAINER": "finnish-news-tools",
+    "RSS_PARSER_DAILY_LIMIT": "50",
+    "ARTICLE_SCRAPER_DAILY_LIMIT": "50",
+    "TRANSLATION_DAILY_LIMIT": "50",
+    "TRANSLATION_CACHE_TTL_HOURS": "24",
+    "CACHE_TTL_HOURS": "1",
+    "AZURE_TRANSLATOR_KEY": "your-translator-key-here",
+    "AZURE_TRANSLATOR_ENDPOINT": "https://api.cognitive.microsofttranslator.com/",
+    "AZURE_TRANSLATOR_REGION": "westeurope",
+    "AZURE_TRANSLATOR_RESOURCE_ID": "/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.CognitiveServices/accounts/{name}",
+    "AZURE_TRANSLATOR_QUOTA_LIMIT": "2000000",
+    "AZURE_TRANSLATOR_BILLING_CYCLE_START_DAY": "1",
+    "AUTH_SECRET": "your-auth-secret-here-change-in-production",
+    "RATE_LIMIT_TABLE_NAME": "rateLimits",
+    "AUTH_RATE_LIMIT_PER_WINDOW": "5",
+    "AUTH_RATE_LIMIT_WINDOW_MINUTES": "15",
+    "ADD_ORIGIN_RSS": "true",
+    "SCRAPER_CONFIG_PATH": "scraper-config.yaml.local"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
+  },
+  "ConnectionStrings": {}
+}

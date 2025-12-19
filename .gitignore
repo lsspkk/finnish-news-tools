@@ -44,3 +44,4 @@ translator/cache/
 translator/config.yaml
 translator/.env
 responses/
+local-dev/

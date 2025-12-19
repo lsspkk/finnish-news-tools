@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles - Finnish News Reader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Finnish News Reader</h1>
+        <div>
+            <span class="username"></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="feedInfo"></div>
+        <ul class="article-list" id="articleList"></ul>
+    </div>
+    
+    <script>
+        // Load config.js.local for local dev, config.js for Azure deployment
+        (function() {
+            const isLocalDev = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1' ||
+                               window.location.hostname === '';
+            const configFile = isLocalDev ? 'config.js.local' : 'config.js';
+            document.write('<script src="' + configFile + '"><\/script>');
+        })();
+    </script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script src="api.js"></script>
+    <script>
+        if (!isAuthenticated()) {
+            window.location.href = 'index.html';
+        }
+        
+        renderHeader();
+        
+        async function forceReloadRSS() {
+            const listEl = document.getElementById('articleList');
+            const infoEl = document.getElementById('feedInfo');
+            
+            try {
+                showLoading(listEl);
+                const feedData = await fetchRSSFeed(true);
+                
+                if (!feedData || !feedData.items || feedData.items.length === 0) {
+                    listEl.innerHTML = '<div class="no-data">No articles available in cache</div>';
+                    return;
+                }
+                
+                hideLoading(listEl);
+                
+                if (feedData.feed_metadata) {
+                    const meta = feedData.feed_metadata;
+                    const ylePaauutisetUrl = CONFIG.ylePaauutisetUrl || 'https://yle.fi/uutiset/paauutiset';
+                    const loadDate = formatRSSLoadDate(meta.fetch_timestamp);
+                    const isOld = isRSSFeedOld(meta.fetch_timestamp, 8);
+                    const refreshButton = isOld ? `<button class="btn btn-secondary" onclick="forceReloadRSS()">Päivitä</button>` : '';
+                    infoEl.innerHTML = `
+                        <div class="feed-info">
+                            <div class="feed-info-header">
+                                <h2>${meta.title}</h2>
+                                <div class="feed-info-links">
+                                    <a href="https://yle.fi/rss" target="_blank" class="feed-rss-link">RSS-syöte</a>
+                                    <a href="${ylePaauutisetUrl}" target="_blank" class="btn btn-primary">Yle pääuutiset</a>
+                                </div>
+                            </div>
+                            <div class="feed-load-info">
+                                <span>${loadDate}</span>
+                                ${refreshButton}
+                            </div>
+                            <div class="quota-display" id="quotaDisplay"></div>
+                        </div>
+                    `;
+                }
+                
+                await loadQuota();
+                
+                listEl.innerHTML = feedData.items.map(item => `
+                    <li class="article-item" id="article-${item.shortcode}">
+                        <a href="article.html?shortcode=${item.shortcode}">
+                            <div class="article-title">${item.title}</div>
+                            ${item.description ? `
+                                <div class="article-description">${item.description}</div>
+                            ` : ''}
+                            <div class="article-meta">
+                                ${formatDate(item.pub_date)}
+                            </div>
+                            ${item.categories && item.categories.length > 0 ? `
+                                <div class="article-categories">
+                                    ${item.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                        </a>
+                    </li>
+                `).join('');
+            } catch (error) {
+                hideLoading(listEl);
+                showError(`Error reloading articles: ${error.message}`);
+            }
+        }
+        
+        async function loadArticles() {
+            const listEl = document.getElementById('articleList');
+            const infoEl = document.getElementById('feedInfo');
+            
+            try {
+                showLoading(listEl);
+                const feedData = await fetchRSSFeed();
+                
+                if (!feedData || !feedData.items || feedData.items.length === 0) {
+                    listEl.innerHTML = '<div class="no-data">No articles available in cache</div>';
+                    return;
+                }
+                
+                hideLoading(listEl);
+                
+                if (feedData.feed_metadata) {
+                    const meta = feedData.feed_metadata;
+                    const ylePaauutisetUrl = CONFIG.ylePaauutisetUrl || 'https://yle.fi/uutiset/paauutiset';
+                    const loadDate = formatRSSLoadDate(meta.fetch_timestamp);
+                    const isOld = isRSSFeedOld(meta.fetch_timestamp, 8);
+                    const refreshButton = isOld ? `<button class="btn btn-secondary" onclick="forceReloadRSS()">Päivitä</button>` : '';
+                    infoEl.innerHTML = `
+                        <div class="feed-info">
+                            <div class="feed-info-header">
+                                <h2>${meta.title}</h2>
+                                <div class="feed-info-links">
+                                    <a href="https://yle.fi/rss" target="_blank" class="feed-rss-link">RSS-syöte</a>
+                                    <a href="${ylePaauutisetUrl}" target="_blank" class="btn btn-primary">Yle pääuutiset</a>
+                                </div>
+                            </div>
+                            <div class="feed-load-info">
+                                <span>${loadDate}</span>
+                                ${refreshButton}
+                            </div>
+                            <div class="quota-display" id="quotaDisplay"></div>
+                        </div>
+                    `;
+                }
+                
+                await loadQuota();
+                
+                listEl.innerHTML = feedData.items.map(item => `
+                    <li class="article-item" id="article-${item.shortcode}">
+                        <a href="article.html?shortcode=${item.shortcode}">
+                            <div class="article-title">${item.title}</div>
+                            ${item.description ? `
+                                <div class="article-description">${item.description}</div>
+                            ` : ''}
+                            <div class="article-meta">
+                                ${formatDate(item.pub_date)}
+                            </div>
+                            ${item.categories && item.categories.length > 0 ? `
+                                <div class="article-categories">
+                                    ${item.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                        </a>
+                    </li>
+                `).join('');
+                
+                // Scroll to article if hash is present
+                const hash = window.location.hash;
+                if (hash) {
+                    setTimeout(() => {
+                        const element = document.querySelector(hash);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                }
+                
+            } catch (error) {
+                hideLoading(listEl);
+                listEl.innerHTML = `<div class="no-data">Error loading articles: ${error.message}</div>`;
+            }
+        }
+        
+        async function loadQuota() {
+            try {
+                const quotaData = await fetchTranslatorQuota();
+                if (quotaData) {
+                    displayQuota(quotaData);
+                }
+            } catch (error) {
+                console.log('Could not load quota:', error);
+            }
+        }
+        
+        function displayQuota(quotaData) {
+            const quotaEl = document.getElementById('quotaDisplay');
+            if (!quotaEl) return;
+            
+            const remaining = quotaData.remaining_quota || 0;
+            const percentage = quotaData.percentage_used || 0;
+            const nextReset = quotaData.next_reset_date || '';
+            
+            let resetText = '';
+            if (nextReset) {
+                const resetDate = new Date(nextReset);
+                resetText = resetDate.toLocaleDateString('fi-FI', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric'
+                });
+            }
+            
+            const formattedRemaining = formatQuotaNumber(remaining);
+            quotaEl.textContent = `AzureTranslator quota: ${percentage.toFixed(1)}%, ${formattedRemaining} merkkiä käännettävissä${resetText ? ` ${resetText} asti` : ''}.`;
+        }
+        
+        function formatQuotaNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+        
+        loadArticles();
+    </script>
+</body>
+</html>

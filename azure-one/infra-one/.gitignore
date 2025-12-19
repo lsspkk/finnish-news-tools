@@ -1,0 +1,6 @@
+security
+resource-names.env
+azure.settings.env
+logs/
+*.log
+plan.ignore.md

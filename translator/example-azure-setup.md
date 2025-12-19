@@ -4,8 +4,8 @@ This guide will help you set up Azure Translator API for use with the Finnish ne
 
 ## Prerequisites
 
-- An Azure account (you mentioned you already have one)
-- Azure CLI installed and configured (recommended) OR access to the Azure Portal
+- An Azure account 
+- Azure CLI installed and configured 
 
 ## Step 1: Create a Translator Resource in Azure
 
@@ -26,14 +26,14 @@ You can create the Translator resource using either Azure CLI (faster, scriptabl
 
 3. Create a resource group (if you don't have one)
     az group create \
-      --name finnish-news-translator-rg \
+      --name rg-translator-placeholder \
       --location westeurope
-    Replace `finnish-news-translator-rg` with your preferred name and `westeurope` with your preferred region.
+    Replace `rg-translator-placeholder` with your preferred name and `westeurope` with your preferred region.
 
 4. Create the Translator resource
     az cognitiveservices account create \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg \
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder \
       --kind TextTranslation \
       --sku F0 \
       --location westeurope
@@ -47,8 +47,8 @@ You can create the Translator resource using either Azure CLI (faster, scriptabl
 
 5. Wait for deployment (usually takes 1-2 minutes)
     az cognitiveservices account show \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg \
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder \
       --query "properties.provisioningState"
     This will show `Succeeded` when ready.
 
@@ -70,7 +70,7 @@ You can create the Translator resource using either Azure CLI (faster, scriptabl
      - Or select an existing one
    - Region: Choose a region close to you (e.g., "West Europe", "East US")
      - Note: The region affects latency but not functionality
-   - Name: Give your resource a unique name (e.g., `finnish-translator`)
+   - Name: Give your resource a unique name (e.g., `translator-placeholder`)
    - Pricing Tier: 
      - Free (F0): 2 million characters per month free
      - Standard (S1): Pay-as-you-go pricing
@@ -89,8 +89,8 @@ Once your Translator resource is created, retrieve your credentials:
 
 1. Get your API keys
     az cognitiveservices account keys list \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder
     
     This outputs:
     {
@@ -102,8 +102,8 @@ Once your Translator resource is created, retrieve your credentials:
 
 2. Get your endpoint and region
     az cognitiveservices account show \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg \
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder \
       --query "{endpoint:properties.endpoint, location:location}" \
       --output json
     
@@ -122,14 +122,14 @@ Once your Translator resource is created, retrieve your credentials:
 Quick one-liner to get everything:
     # Get key1
     az cognitiveservices account keys list \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg \
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder \
       --query "key1" --output tsv
 
     # Get location/region
     az cognitiveservices account show \
-      --name finnish-translator \
-      --resource-group finnish-news-translator-rg \
+      --name translator-placeholder \
+      --resource-group rg-translator-placeholder \
       --query "location" --output tsv
 
 ### Method B: Using Azure Portal
@@ -167,23 +167,16 @@ Quick one-liner to get everything:
     # Get character translation metrics (correct metric name)
     # Note: "CharactersTranslated" is deprecated, use "TextCharactersTranslated"
     az monitor metrics list \
-      --resource /subscriptions/$(az account show --query id -o tsv)/resourceGroups/finnish-news-translator-rg/providers/Microsoft.CognitiveServices/accounts/finnish-translator \
+      --resource /subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-translator-placeholder/providers/Microsoft.CognitiveServices/accounts/translator-placeholder \
       --metric TextCharactersTranslated \
       --start-time $(date -d "1 month ago" +%Y-%m-%dT%H:%M:%S) \
       --end-time $(date +%Y-%m-%dT%H:%M:%S) \
       --output table
     
-    # View successful API calls
-    az monitor metrics list \
-      --resource /subscriptions/$(az account show --query id -o tsv)/resourceGroups/finnish-news-translator-rg/providers/Microsoft.CognitiveServices/accounts/finnish-translator \
-      --metric SuccessfulCalls \
-      --start-time $(date -d "1 month ago" +%Y-%m-%dT%H:%M:%S) \
-      --end-time $(date +%Y-%m-%dT%H:%M:%S) \
-      --output table
     
     # List all available metrics for your resource
     az monitor metrics list-definitions \
-      --resource /subscriptions/$(az account show --query id -o tsv)/resourceGroups/finnish-news-translator-rg/providers/Microsoft.CognitiveServices/accounts/finnish-translator \
+      --resource /subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-translator-placeholder/providers/Microsoft.CognitiveServices/accounts/translator-placeholder \
       --output table
 
 3. View cost breakdown
@@ -191,7 +184,7 @@ Quick one-liner to get everything:
     az consumption usage list \
       --start-date $(date +%Y-%m-01) \
       --end-date $(date +%Y-%m-%d) \
-      --query "[?contains(instanceName, 'finnish-translator')]" \
+      --query "[?contains(instanceName, 'translator-placeholder')]" \
       --output table
 
 Note: Azure Translator billing is based on characters processed (Unicode code points).
@@ -200,20 +193,6 @@ Note: Azure Translator billing is based on characters processed (Unicode code po
 - Example: 1,000 characters translated to 3 languages = 3,000 characters billed
 - The API can return character counts per sentence if you use includeSentenceLength=true
 
-Alternative: Check usage in Azure Portal
-- Go to Azure Portal → Your Translator resource → Metrics
-- Available metrics:
-  - TextCharactersTranslated: Total characters translated (standard translation)
-  - TextCustomCharactersTranslated: Characters translated using custom models
-  - SuccessfulCalls: Number of successful API calls
-  - TotalCalls: Total API calls (successful + failed)
-  - TotalErrors: Number of failed API calls
-  - ClientErrors: Number of client-side errors (HTTP 4xx)
-  - ServerErrors: Number of server-side errors (HTTP 5xx)
-  - BlockedCalls: Number of calls blocked due to rate/quota limits
-  - Latency: Average request latency in milliseconds
-- View daily/monthly character counts and API call statistics
-- Note: "CharactersTranslated" metric is deprecated (removed Oct 2022), use "TextCharactersTranslated" instead
 
 ## Step 3: Configure the Project
 
@@ -445,25 +424,6 @@ Or if you've updated `config.yaml`:
 
 ## Troubleshooting
 
-### Error: "Invalid subscription key"
-- Verify your API key is correct
-- Check that you copied the entire key (no extra spaces)
-- Ensure you're using KEY 1 or KEY 2 from the correct resource
-
-### Error: "Invalid region"
-- Verify the region name matches your resource region
-- Common regions: `westeurope`, `eastus`, `southeastasia`
-- Check your resource's "Keys and Endpoint" page for the exact region name
-
-### Error: "Quota exceeded"
-- You've exceeded your free tier limit (2M characters/month)
-- Wait for the next billing cycle, or upgrade to Standard tier
-- Check usage in Azure Portal → Metrics
-
-### Error: "Language not supported"
-- Verify the language code is correct for Azure Translator
-- Some codes differ from LibreTranslate (e.g., `zh-Hans` vs `zh`)
-- Check supported languages: https://docs.microsoft.com/azure/cognitive-services/translator/language-support
 
 ### Rate Limiting
 - Azure Translator has rate limits based on your tier
@@ -480,30 +440,3 @@ Or if you've updated `config.yaml`:
 - Azure CLI Documentation: https://docs.microsoft.com/cli/azure/cognitiveservices/account
 - Azure CLI Install: https://docs.microsoft.com/cli/azure/install-azure-cli
 
-## Next Steps
-
-After setting up Azure Translator:
-
-1. Implement the Azure translator class (if not already done)
-   - Create `translator/translators/azure.py`
-   - Implement `AzureTranslator` class extending `BaseTranslator`
-   - Use Azure Translator REST API v3.0
-
-2. Update translate_news.py
-   - Add support for `azure` provider in the main function
-   - Import and initialize `AzureTranslator` when provider is `azure`
-
-3. Test with a small sample
-   - Start with a single article
-   - Verify translations are accurate
-   - Check Azure Portal metrics to see usage
-
-4. Monitor costs
-   - Set up cost alerts in Azure Portal
-   - Track usage in the Metrics section
-   - Review billing regularly
-   - Use the billing commands in View Billing Information section to check usage via CLI
-
----
-
-Note: This guide assumes you'll need to implement the Azure translator integration code separately. The configuration and setup steps above will prepare your Azure account and provide the necessary credentials.

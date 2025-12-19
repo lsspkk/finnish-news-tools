@@ -1,0 +1,20 @@
+// DEVOPS
+const CONFIG = {
+    authApiUrl: "https://PLACEHOLDER_FUNCTION_APP_NAME.azurewebsites.net/api",
+    apiBaseUrl: "https://PLACEHOLDER_FUNCTION_APP_NAME.azurewebsites.net/api",
+    translatorApiUrl: "https://PLACEHOLDER_FUNCTION_APP_NAME.azurewebsites.net/api",
+    storageContainer: "PLACEHOLDER_STORAGE_CONTAINER",
+    rssFeedPath: "cache/yle/paauutiset.json",
+    articlePath: "cache/yle/articles",
+    ylePaauutisetUrl: "https://yle.fi/uutiset/paauutiset",
+    languages: [
+        { code: "en", name: "English" },
+        { code: "sv", name: "Svenska" },
+        { code: "de", name: "Deutsch" },
+        { code: "es", name: "Español" },
+        { code: "zh", name: "中文" }
+    ],
+    sourceLanguage: "fi",
+    isLocalDev: false,
+    quotaCacheHours: 2
+}
